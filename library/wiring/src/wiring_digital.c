@@ -87,7 +87,26 @@ void attachInterrupt(pin_size_t pin, voidFuncPtr callback, PinStatus mode) // en
     if (callback && pin < PINS_COUNT)
     {
         pin_handlers[pin].cb = callback;
-        gpio_set_irq_enabled_with_callback(pin, mode, true, &irq_gpio_callback);
+        int32_t event_mask;
+        switch (mode)
+        {
+        case LOW:
+            event_mask = GPIO_IRQ_LEVEL_LOW;
+            break;
+        case HIGH:
+            event_mask = GPIO_IRQ_LEVEL_HIGH;
+            break;
+        case FALLING:
+            event_mask = GPIO_IRQ_EDGE_FALL;
+            break;
+        case RISING:
+            event_mask = GPIO_IRQ_EDGE_RISE;
+            break;
+        default:
+            event_mask = 0;
+            break;
+        }
+        gpio_set_irq_enabled_with_callback(pin, event_mask, true, &irq_gpio_callback);
     }
 }
 
